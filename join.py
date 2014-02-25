@@ -71,7 +71,7 @@ for dirpath, dirnames, filenames in os.walk(os.environ['NZBPP_DIRECTORY']):
             size = size + os.path.getsize(os.path.join(dir,file))
 
 if not chunks:
-    print('[DETAIL] No files found to join')
+    print('[DETAIL] No files found to join. Skipping join!')
     sys.exit(POSTPROCESS_SKIPPED)
 
 chunks.sort()
@@ -86,11 +86,11 @@ if os.path.isfile(outfile):
             if os.environ['NZBPO_OVERWRITEFILES'] == 'yes':
                 os.unlink(outfile)
             else:
-                print('[ERROR] %s was found and does not match expected output size.  Not removing outfile.' % outfile)
+                print('[ERROR] %s was found and does not match expected output size.  Not overwriting, OVERWRITEFILES is sent to %s' % (outfile, os.environ['NZBPO_OVERWRITEFILES']))
                 sys.exit(POSTPROCESS_ERROR)
             
     else:
-        print('[DETAIL] %s was found and matches the expected output size from the join procedure.  Skipping join!' % outfile)
+        print('[DETAIL] %s was found at %s bytes. Output matches at %s bytes. Skipping join!' % (outfile, os.path.getsize(outfile),size))
         sys.exit(POSTPROCESS_SKIPPED)
      
 wdata = ''
