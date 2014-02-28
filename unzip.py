@@ -14,12 +14,5 @@ if ext.lower() == '.zip':
 else:
     checkcat = os.environ['NZBNP_NZBNAME'].split('.',2)
     if checkcat[0] == 'cat':
-       print("[NZB] CATEGORY=%s" % checkcat[1])
        print("[NZB] NZBNAME=%s" % checkcat[2])
-#       print(checkcat[2] + ' ' + checkcat[1])
-
-#    with zipfile.ZipFile(os.environ['NZBNP_FILENAME']) as zippedfile:
-#        print("[NZB] CATEGORY=%s" % os.environ['NZBNP_CATEGORY'])
-#        zippedfile.extractall(os.environ['NZBNP_DIRECTORY'])
-#        print("[NZB] CATEGORY=%s" % os.environ['NZBNP_CATEGORY'])
-
+       print("[NZB] CATEGORY=%s" % checkcat[1])
