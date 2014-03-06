@@ -48,73 +48,74 @@ if not os.environ.has_key('NZBOP_SCRIPTDIR'):
 	sys.exit(POSTPROCESS_ERROR)
 
 
-if os.path.exists(os.environ['NZBPP_FINALDIR']):
-#    print('[INFO] Finaldir was found.  Using %s as the dir' % os.environ['NZBPP_FINALDIR'])
-    dir = os.environ['NZBPP_FINALDIR']
-else:
-#    print('[INFO] Finaldir was not found. Using %s as the dir' % os.environ['NZBPP_DIRECTORY'])
-    dir = os.environ['NZBPP_DIRECTORY']
-
-
 sys.stdout.flush()
-
 
 matcher = re.compile('\.[0-9]+$')
 chunks = []
-size = 0
+chunks2 = []
 
 for dirpath, dirnames, filenames in os.walk(os.environ['NZBPP_DIRECTORY']):
     for file in filenames:
-        fileExtension = os.path.splitext(file)[1]
-        if matcher.match(fileExtension):
-            chunks.append(file)
-            size = size + os.path.getsize(os.path.join(dir,file))
+        chunks.append(os.path.join(dirpath,file))
 
-if not chunks:
+chunks2 = [f for f in chunks if matcher.search(f)]
+
+if not chunks2:
     print('[DETAIL] No files found to join. Skipping join!')
     sys.exit(POSTPROCESS_SKIPPED)
 
-chunks.sort()
-outfile = os.path.join(dir,os.path.splitext(chunks[0])[0])
-if os.path.isfile(outfile):
-    if os.path.getsize(outfile) != size:
-        if os.path.splitext(chunks[0])[0] + '.001' not in chunks:
-            os.rename(outfile, outfile + '.001')
-            chunks.append(os.path.splitext(chunks[0])[0] + '.001')
-            chunks.sort()
-        else:
-            if os.environ['NZBPO_OVERWRITEFILES'] == 'yes':
-                os.unlink(outfile)
-            else:
-                print('[ERROR] %s was found and does not match expected output size.  Not overwriting, OVERWRITEFILES is sent to %s' % (outfile, os.environ['NZBPO_OVERWRITEFILES']))
-                sys.exit(POSTPROCESS_ERROR)
-            
-    else:
-        print('[DETAIL] %s was found at %s bytes. Output matches at %s bytes. Skipping join!' % (outfile, os.path.getsize(outfile),size))
-        sys.exit(POSTPROCESS_SKIPPED)
-     
-wdata = ''
-newfile = open(outfile, "ab")
-i = 0
-for f in chunks:
-    i = i + 1
-    print('[INFO] joining file %s' % (dir + os.path.sep + f))
-    part = open(dir + os.path.sep + f, "rb")
-    reading = True
-    while reading:
-        wdata = part.read(4096)
-        if (len(wdata) > 0):
-            newfile.write(wdata)
-        else:
-           reading = False
-    part.close()
-    if os.environ['NZBPO_PRESERVEFILES'] == 'yes':
-        print ('[INFO] File %s was not deleted' % f)
-    else:
-        print('[INFO] deleted file %s' % f)
-        os.unlink(dir + os.path.sep + f)
 
-newfile.close()
+
+sets = {}
+set = None
+
+for file in chunks2:
+    start, finish = os.path.splitext(file)
+    if start not in sets:
+        sets[start] = []
+    sets[start].append(file)
+
+for set in sets:
+    sets[set].sort()
+    current = sets[set]
+    outfile = set
+    if os.path.isfile(outfile):
+        if os.path.getsize(outfile) <= os.path.getsize(current[0]):
+            if outfile + '.001' not in current:
+                os.rename(outfile, outfile + '.001')
+                current.append(outfile + '.001')
+                current.sort()
+            else:
+                if os.environ['NZBPO_OVERWRITEFILES'] == 'yes':
+                    os.unlink(outfile)
+                else:
+                    print('[ERROR] %s was found and does not match expected output size.  Not overwriting, OVERWRITEFILES is sent to %s' % (outfile, os.environ['NZBPO_OVERWRITEFILES']))
+                    sys.exit(POSTPROCESS_ERROR)
+        else:
+            print('[DETAIL] %s was found at %s bytes. Output matches at %s bytes. Skipping join!' % (outfile, os.path.getsize(outfile),size))
+            sys.exit(POSTPROCESS_SKIPPED)
+
+    wdata = ''
+    newfile = open(outfile, "ab")
+    i = 0
+    for f in current:
+        i = i + 1
+        print('[INFO] joining file %s' % f)
+        part = open(f, "rb")
+        reading = True
+        while reading:
+            wdata = part.read(4096)
+            if (len(wdata) > 0):
+                newfile.write(wdata)
+            else:
+                reading = False
+        part.close()
+        if os.environ['NZBPO_PRESERVEFILES'] == 'yes':
+            print ('[INFO] File %s was not deleted' % f)
+        else:
+            print('[INFO] deleted file %s' % f)
+            os.unlink(f)
+    newfile.close()
 
 if os.environ['NZBPP_PARSTATUS'] == '0':
     sys.exit(POSTPROCESS_PAR2)
