@@ -116,8 +116,4 @@ for set in sets:
             print('[INFO] deleted file %s' % f)
             os.unlink(f)
     newfile.close()
-
-if os.environ['NZBPP_PARSTATUS'] == '0':
-    sys.exit(POSTPROCESS_PAR2)
-else:
-    sys.exit(POSTPROCESS_SUCCESS)
+sys.exit(POSTPROCESS_SUCCESS)
