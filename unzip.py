@@ -1,4 +1,17 @@
 #!/usr/bin/env python
+#
+##############################################################################
+### NZBGET SCAN SCRIPT                                          ###
+
+# Unzips zipped nzbs.
+#
+# NOTE: This script requires Python to be installed on your system.
+
+##############################################################################
+### OPTIONS                                                                ###
+
+### NZBGET SCAN SCRIPT                                          ###
+##############################################################################
 import os
 import sys
 import zipfile
