@@ -96,24 +96,24 @@ for set in sets:
             sys.exit(POSTPROCESS_SKIPPED)
 
     wdata = ''
-    newfile = open(outfile, "ab")
-    i = 0
-    for f in current:
-        i = i + 1
-        print('[INFO] joining file %s' % f)
-        part = open(f, "rb")
-        reading = True
-        while reading:
-            wdata = part.read(4096)
-            if (len(wdata) > 0):
-                newfile.write(wdata)
+    with open(outfile, "ab") as newfile:
+        i = 0
+        for f in current:
+            i = i + 1
+            print('[INFO] joining file %s' % f)
+            with open(f, "rb") as part:
+                reading = True
+                while reading:
+                    wdata = part.read(4096)
+                    if (len(wdata) > 0):
+                        newfile.write(wdata)
+                    else:
+                        reading = False
+                part.close()
+            if os.environ['NZBPO_PRESERVEFILES'] == 'yes':
+                print ('[INFO] File %s was not deleted' % f)
             else:
-                reading = False
-        part.close()
-        if os.environ['NZBPO_PRESERVEFILES'] == 'yes':
-            print ('[INFO] File %s was not deleted' % f)
-        else:
-            print('[INFO] deleted file %s' % f)
-            os.unlink(f)
-    newfile.close()
+                print('[INFO] deleted file %s' % f)
+                os.unlink(f)
+        newfile.close()
 sys.exit(POSTPROCESS_SUCCESS)
