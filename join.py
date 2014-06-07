@@ -116,4 +116,4 @@ for set in sets:
                 print('[INFO] deleted file %s' % f)
                 os.unlink(f)
         newfile.close()
-sys.exit(POSTPROCESS_SUCCESS)
+sys.exit(POSTPROCESS_PAR2)
