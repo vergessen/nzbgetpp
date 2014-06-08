@@ -32,4 +32,4 @@ if ext.lower() == '.zip':
     else:
         zipf.extractall(dir)     
     if(os.environ['NZBPO_REMOVE_ZIP']):
-        os.unlink(os.environ['NZBNP_FILENAME'])
+        os.unlink(filename)
