@@ -64,11 +64,8 @@ if not chunks2:
     print('[DETAIL] No files found to join. Skipping join!')
     sys.exit(POSTPROCESS_SKIPPED)
 
-
-
 sets = {}
 set = None
-
 for file in chunks2:
     start, finish = os.path.splitext(file)
     if start not in sets:
@@ -89,11 +86,12 @@ for set in sets:
                 if os.environ['NZBPO_OVERWRITEFILES'] == 'yes':
                     os.unlink(outfile)
                 else:
-                    print('[ERROR] %s was found and does not match expected output size.  Not overwriting, OVERWRITEFILES is sent to %s' % (outfile, os.environ['NZBPO_OVERWRITEFILES']))
+                    print('[ERROR] %s was found and does not match expected output size.  Not overwriting, OVERWRITEFILES is set to %s' % (outfile, os.environ['NZBPO_OVERWRITEFILES']))
                     sys.exit(POSTPROCESS_ERROR)
         else:
-            print('[DETAIL] %s was found at %s bytes. Output matches at %s bytes. Skipping join!' % (outfile, os.path.getsize(outfile),size))
+            print('[DETAIL] %s was found at %s bytes. Larger then first join file at %s. Skipping join!' % (outfile, os.path.getsize(outfile),os.path.getsize(current[0])))
             sys.exit(POSTPROCESS_SKIPPED)
+
 
     wdata = ''
     with open(outfile, "ab") as newfile:
@@ -116,4 +114,4 @@ for set in sets:
                 print('[INFO] deleted file %s' % f)
                 os.unlink(f)
         newfile.close()
-sys.exit(POSTPROCESS_PAR2)
+sys.exit(92)
