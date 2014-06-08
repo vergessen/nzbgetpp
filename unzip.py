@@ -9,9 +9,13 @@
 
 ##############################################################################
 ### OPTIONS                                                                ###
-
+#
+# Delete zip after extraction (0, 1).
+# Remove zip when done processing.  Helps if you upload a generic named zip.
+#remove_zip=0
 ### NZBGET SCAN SCRIPT                                          ###
 ##############################################################################
+
 import os
 import sys
 import zipfile
@@ -27,6 +31,5 @@ if ext.lower() == '.zip':
         zipf.extractall(dir + os.path.sep + cat)
     else:
         zipf.extractall(dir)     
-
-#file is there but has to be cleared on next pass?
-#    os.unlink(os.environ['NZBNP_FILENAME'] + '.processed')
+    if(os.environ['NZBPO_REMOVE_ZIP']):
+        os.unlink(os.environ['NZBNP_FILENAME'])
